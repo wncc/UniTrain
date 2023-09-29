@@ -1,0 +1,22 @@
+2023-09-29 19:18:18,456 [INFO] - Epoch 1, Validation Accuracy: 50.00%
+2023-09-29 19:18:18,535 [INFO] - Saved checkpoint to checkpoints\model_epoch_1.pth
+2023-09-29 19:18:31,469 [INFO] - Epoch 2, Validation Accuracy: 50.00%
+2023-09-29 19:18:44,382 [INFO] - Epoch 3, Validation Accuracy: 50.00%
+2023-09-29 19:18:57,140 [INFO] - Epoch 4, Validation Accuracy: 50.00%
+2023-09-29 19:19:09,982 [INFO] - Epoch 5, Validation Accuracy: 50.00%
+2023-09-29 19:19:22,838 [INFO] - Epoch 6, Validation Accuracy: 50.00%
+2023-09-29 19:19:35,648 [INFO] - Epoch 7, Validation Accuracy: 50.00%
+2023-09-29 19:19:48,396 [INFO] - Epoch 8, Validation Accuracy: 50.00%
+2023-09-29 19:20:01,128 [INFO] - Epoch 9, Validation Accuracy: 50.00%
+2023-09-29 19:20:14,409 [INFO] - Epoch 10, Validation Accuracy: 33.33%
+2023-09-29 19:22:21,907 [INFO] - Epoch 1, Validation Accuracy: 50.00%
+2023-09-29 19:22:21,983 [INFO] - Saved checkpoint to checkpoints\model_epoch_1.pth
+2023-09-29 19:22:35,008 [INFO] - Epoch 2, Validation Accuracy: 50.00%
+2023-09-29 19:22:48,031 [INFO] - Epoch 3, Validation Accuracy: 50.00%
+2023-09-29 19:23:01,652 [INFO] - Epoch 4, Validation Accuracy: 50.00%
+2023-09-29 19:23:14,966 [INFO] - Epoch 5, Validation Accuracy: 16.67%
+2023-09-29 19:23:27,951 [INFO] - Epoch 6, Validation Accuracy: 0.00%
+2023-09-29 19:23:40,775 [INFO] - Epoch 7, Validation Accuracy: 50.00%
+2023-09-29 19:23:53,542 [INFO] - Epoch 8, Validation Accuracy: 50.00%
+2023-09-29 19:24:06,338 [INFO] - Epoch 9, Validation Accuracy: 50.00%
+2023-09-29 19:24:20,116 [INFO] - Epoch 10, Validation Accuracy: 16.67%
