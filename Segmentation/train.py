@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--logging_directory', type=str, default='logs', help='Directory for logging')
     parser.add_argument('--checkpoint_directory', type=str, default='checkpoints', help='Directory for saving checkpoints')
     parser.add_argument('--classes', type=int, default='2', help='No. of classes you want to segment your model into.')
+    parser.add_argument('--iou', type=bool, default=False, help='Enable or disable IoU')
+    parser.add_argument('--device', type=str, default='cpu', help='Device to train on')
     args = parser.parse_args()
 
     # Create the logging directory
@@ -94,7 +96,9 @@ def main():
         num_epochs=args.epochs,
         learning_rate=args.learning_rate,
         checkpoint_dir=args.checkpoint_directory,
-        logger=logging
+        logger=logging,
+        iou=args.iou,
+        device=args.device
     )
 
 
