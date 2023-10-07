@@ -1,8 +1,9 @@
 from setuptools import setup
+from setuptools import find_packages
 
 setup(
     name='UniTrain',
-    version='0.2',
+    version='0.2.1',
     author='Ishan Upadhyay',
     author_email='ishan.upadhyay.iitb@gmail.com',
     description='A generalized training framework for Deep Learning Tasks',
@@ -10,7 +11,11 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/ishan121028/UniTrain',
     download_url='https://github.com/ishan121028/UniTrain/archive/v0.1.tar.gz',
-    packages=['UniTrain'],
+    packages=find_packages(
+        where='UniTrain',
+        include=['*'],    
+        ) ,
+    package_dir={'':'UniTrain'},
     install_requires=[
         'torch',
         'torchvision',
