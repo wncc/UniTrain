@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+UniTrain/__init__.py
+UniTrain.egg-info/PKG-INFO
+UniTrain.egg-info/SOURCES.txt
+UniTrain.egg-info/dependency_links.txt
+UniTrain.egg-info/requires.txt
+UniTrain.egg-info/top_level.txt
