@@ -1,31 +1,35 @@
-from distutils.core import setup
+from setuptools import setup
+
+with open("README.rst", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
-  name = 'UniTrain',         # How you named your package folder (MyLib)
-  packages = ['UniTrain'],   # Chose the same as "name"
-  version = '0.1',      # Start with a small number and increase it with every change you make
-  license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
-  description = 'A generalized training framework for Deep Learning Tasks',   # Give a short description about your library
-  author = 'Ishan Upadhyay',                   # Type in your name
-  author_email = 'ishan.upadhyay.iitb@gmail.com',      # Type in your E-Mail
-  url = 'https://github.com/ishan121028/UniTrain',   # Provide either the link to your github or to your website
-  download_url = 'https://github.com/ishan121028/UniTrain/archive/refs/tags/v_01.tar.gz',    # I explain this later on
-  keywords = ['SOME', 'MEANINGFULL', 'KEYWORDS'],   # Keywords that define your package best
-  install_requires=[            # I get to this in a second
-          'torch',
-          'torchvision',
-          'numpy',
-          'pandas',
-          'glob',
-          'logging',  
-      ],
-  classifiers=[
-    'Development Status :: 3 - Alpha',      # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
-    'Intended Audience :: Machine Learning Practitionists',      # Define that your audience are developers
-    'Topic :: Software Development :: Build Tools',
-    'License :: OSI Approved :: MIT License',   # Again, pick a license
-    'Programming Language :: Python :: 3',      #Specify which pyhton versions that you want to support
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
-  ],
+    name='UniTrain',
+    version='0.1',
+    author='Ishan Upadhyay',
+    author_email='ishan.upadhyay.iitb@gmail.com',
+    description='A generalized training framework for Deep Learning Tasks',
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
+    url='https://github.com/ishan121028/UniTrain',
+    download_url='https://github.com/ishan121028/UniTrain/archive/v0.1.tar.gz',
+    packages=['UniTrain'],
+    install_requires=[
+        'torch',
+        'torchvision',
+        'numpy',
+        'pandas',
+    ],
+    keywords=['Deep Learning', 'Machine Learning', 'Training Framework'],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    ],
 )
