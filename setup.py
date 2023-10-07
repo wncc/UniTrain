@@ -6,6 +6,8 @@ setup(
     author='Ishan Upadhyay',
     author_email='ishan.upadhyay.iitb@gmail.com',
     description='A generalized training framework for Deep Learning Tasks',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     url='https://github.com/ishan121028/UniTrain',
     download_url='https://github.com/ishan121028/UniTrain/archive/v0.1.tar.gz',
     packages=['UniTrain'],
