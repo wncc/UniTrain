@@ -1,7 +1,7 @@
 import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from dataset.classification import ClassificationDataset
+from ..dataset.classification import ClassificationDataset
 import torch.optim as optim
 import torch.nn as nn
 import torch
@@ -86,7 +86,21 @@ def parse_folder(dataset_path):
         print("An error occurred:", str(e))
         return None
 
-def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None):
+def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None, device='cpu'):
+    '''Train a PyTorch model for a classification task.
+    Args:
+    model (nn.Module): Torch model to train.
+    train_data_loader (DataLoader): Training data loader.
+    test_data_loader (DataLoader): Testing data loader.
+    num_epochs (int): Number of epochs to train the model for.
+    learning_rate (float): Learning rate for the optimizer.
+    checkpoint_dir (str): Directory to save model checkpoints.
+    logger (Logger): Logger to log training details.
+
+    Returns:
+    None
+    '''
+
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -122,6 +136,8 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
         accuracy = evaluate_model(model, test_data_loader)
         if logger:
             logger.info(f'Epoch {epoch + 1}, Validation Accuracy: {accuracy:.2f}%')
+
+
 
         if accuracy > best_accuracy:
             best_accuracy = accuracy

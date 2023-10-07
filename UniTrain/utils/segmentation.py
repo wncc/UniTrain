@@ -5,7 +5,7 @@ import torch.optim as optim
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from dataset.segmentation import SegmentationDataset
+from ..dataset.segmentation import SegmentationDataset
 import torchsummary
 
 def get_data_loader(image_paths:list, mask_paths:list, batch_size:int, shuffle:bool=True, transform=None) -> DataLoader:

@@ -2,6 +2,7 @@ LICENSE
 README.md
 setup.py
 UniTrain/__init__.py
+UniTrain/train.py
 UniTrain.egg-info/PKG-INFO
 UniTrain.egg-info/SOURCES.txt
 UniTrain.egg-info/dependency_links.txt

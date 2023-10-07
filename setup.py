@@ -16,6 +16,7 @@ setup(
         'torchvision',
         'numpy',
         'pandas',
+        'torchsummary',
     ],
     keywords=['Deep Learning', 'Machine Learning', 'Training Framework'],
     classifiers=[
