@@ -1,5 +1,4 @@
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import setup, find_packages
 
 setup(
     name='UniTrain',
@@ -11,17 +10,14 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/ishan121028/UniTrain',
     download_url='https://github.com/ishan121028/UniTrain/archive/v0.1.tar.gz',
-    packages=find_packages(
-        where='UniTrain',
-        include=['*'],    
-        ) ,
-    package_dir={'':'UniTrain'},
+    packages=find_packages(),
     install_requires=[
         'torch',
         'torchvision',
         'numpy',
         'pandas',
         'torchsummary',
+        'opencv-python',
     ],
     keywords=['Deep Learning', 'Machine Learning', 'Training Framework'],
     classifiers=[
