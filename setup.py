@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='UniTrain',
-    version='0.0.1',
+    version='0.2',
     author='Ishan Upadhyay',
     author_email='ishan.upadhyay.iitb@gmail.com',
     description='A generalized training framework for Deep Learning Tasks',
