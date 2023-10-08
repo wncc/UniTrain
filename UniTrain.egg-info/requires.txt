@@ -1,5 +1,0 @@
-torch
-torchvision
-numpy
-pandas
-torchsummary
