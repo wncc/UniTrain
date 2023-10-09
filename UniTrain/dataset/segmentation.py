@@ -35,5 +35,4 @@ class SegmentationDataset(Dataset):
         
         # You may need to further preprocess the mask if required
         # Example: Convert mask to tensor and perform class mapping
-
         return image, mask
