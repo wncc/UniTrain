@@ -41,8 +41,10 @@ def get_data_loader(data_dir, batch_size, shuffle=True, transform = None, split=
 
     # Create a custom dataset
     dataset = ClassificationDataset(data_dir, transform=transform)
+    print(dataset.__len__())
 
     # Create a data loader
+    print(batch_size)
     data_loader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -84,7 +86,7 @@ def parse_folder(dataset_path):
         print("An error occurred:", str(e))
         return None
 
-def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
+def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None, device='cpu'):
     '''Train a PyTorch model for a classification task.
     Args:
     model (nn.Module): Torch model to train.
@@ -94,16 +96,10 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
     learning_rate (float): Learning rate for the optimizer.
     checkpoint_dir (str): Directory to save model checkpoints.
     logger (Logger): Logger to log training details.
-    device (torch.device): Device to run training on (GPU or CPU).
 
     Returns:
     None
     '''
-
-    if logger:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - Epoch %(epoch)d - Train Acc: %(train_acc).4f - Val Acc: %(val_acc).4f - %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S', filename=logger, filemode='w')
-        logger = logging.getLogger(__name__)
 
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -118,9 +114,6 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
 
         for batch_idx, (inputs, labels) in enumerate(train_data_loader):
             optimizer.zero_grad()  # Zero the parameter gradients
-
-            inputs = inputs.to(device)
-            labels = labels.to(device)
 
             # Forward pass
             outputs = model(inputs)
@@ -143,6 +136,7 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
         accuracy = evaluate_model(model, test_data_loader)
         if logger:
             logger.info(f'Epoch {epoch + 1}, Validation Accuracy: {accuracy:.2f}%')
+
 
 
         if accuracy > best_accuracy:

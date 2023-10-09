@@ -7,11 +7,9 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from ..dataset.segmentation import SegmentationDataset
 import torchsummary
-import logging
-import glob
 
-def get_data_loader(data_dir: str, batch_size:int, shuffle:bool=True, transform=None, split='train') -> DataLoader:
-    """,
+def get_data_loader(image_paths:list, mask_paths:list, batch_size:int, shuffle:bool=True, transform=None) -> DataLoader:
+    """
     Create and return a data loader for a custom dataset.
 
     Args:
@@ -29,9 +27,6 @@ def get_data_loader(data_dir: str, batch_size:int, shuffle:bool=True, transform=
             transforms.ToTensor(),  # Convert images to PyTorch tensors
             transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))  # Normalize with ImageNet stats
         ])
-
-    image_paths = glob.glob(os.path.join(data_dir, split, 'images', '*'))
-    mask_paths = glob.glob(os.path.join(data_dir, split, 'masks', '*'))
 
     # Create a custom dataset
     dataset = SegmentationDataset(image_paths=image_paths, mask_paths=mask_paths, transform=transform)
@@ -88,7 +83,7 @@ def parse_folder(dataset_path):
         return False
 
 
-def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, logger=None, iou=False, device=torch.device('cpu')) -> None:
+def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, logger=None, iou=False, device='cpu'):
     '''Train the model using the given train and test data loaders.
     
     Args: 
@@ -100,17 +95,17 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
     checkpoint_dir (str): Directory to save model checkpoints.
     logger (Logger): Logger to log training information.
     iou (bool): Whether to calculate the IOU score.
-    device (torch.device): Device to run training on (GPU or CPU).
 
     Returns:
     None
     '''
-
-    if logger:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - Epoch %(epoch)d - Train Acc: %(train_acc).4f - Val Acc: %(val_acc).4f - %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S', filename=logger, filemode='w')
-        logger = logging.getLogger(__name__)
-
+    if device == 'cpu':
+        device = torch.device('cpu')
+    elif device == 'cuda':
+        device = torch.device('cuda')
+    else:
+        print(f"{device} is not a valid device.")
+        return None
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -187,6 +182,7 @@ def iou_score(output, target):
     Returns:
     float: The average IoU score.
     '''
+    
     smooth = 1e-6
     output = output.argmax(1)
     intersection = (output & target).float().sum((1, 2))
