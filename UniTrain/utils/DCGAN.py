@@ -48,7 +48,6 @@ def get_data_loader(data_dir, batch_size, shuffle=True, transform = None, split=
     dataset = DCGANdataset(data_dir, transform=transform)
 
     # Create a data loader
-    print("batch_size" , batch_size)
     data_loader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -91,9 +90,7 @@ def train_discriminator(discriminator, generator, real_images, opt_d, batch_size
     opt_d.zero_grad()
 
     
-    print("dimension of real images" , real_images.shape)
-    real_preds = discriminator(real_images)
-    print("dimension of real_preds" , real_preds.shape)
+
     real_targets = torch.ones(real_images.size(0), 1, device=device)
     real_loss = F.binary_cross_entropy(real_preds, real_targets)
     real_score = torch.mean(real_preds).item()
