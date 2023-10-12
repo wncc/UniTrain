@@ -1,18 +1,16 @@
 # UniTrain
 UniTrain is an open-source, unified platform for effortless machine learning model training, evaluation, and deployment across diverse tasks. Experience seamless experimentation and model deployment with UniTrain.
 
+**Note**: For *Google Colab* use '!' before every command.  
+
 ## Installation instruction  
 ### Install the **UniTrain** module using:  
-```pip install -i https://test.pypi.org/simple/ UniTrain==0.2.3```    
+```pip install UniTrain```    
 
 ### Install **torch** library using:  
 ```pip install torch```    
 
-**Note**: You can use your local device or any online notebooks like *Google Colab* or *Kagle* for training the models, as explained below.<br>
-However, using 'Google Colab' would be preferred because of its simple user-friendly interface and the computing power that it brings with itself.
-
-**Note**: For *Google Colab* use '!' before every command.  
-
+# Usage
 
 ## Training  
 ### Classification  
@@ -33,8 +31,8 @@ from UniTrain.utils.classification import parse_folder
 import torch
 
 if parse_folder("/content/data/"):
-  train_dataloader = get_data_loader("/content/data/", 32, True, split='train')
-  test_dataloader = get_data_loader("/content/data/", 32, True, split='test')
+  train_dataloader = get_data_loader("/path/to/dir", 32, True, split='train')
+  test_dataloader = get_data_loader("/path/to/dir", 32, True, split='test')
 
   model = ResNet9(num_classes=6)
   model.to(torch.device('cuda'))
@@ -59,22 +57,12 @@ from UniTrain.utils.segmentation import get_data_loader, train_model, generate_m
 from UniTrain.models.segmentation import UNet
 from UniTrain.utils.segmentation import parse_folder
 import torch
-import os
-import glob
 
 
 if parse_folder(data_dir):    
-    train_path = os.path.join(data_dir, "train")
-    test_path = os.path.join(data_dir, "test")
     
-    train_image_paths = glob.glob(os.path.join(train_path, "images", "*.jpg"))
-    train_mask_paths = glob.glob(os.path.join(train_path, "masks", "*.png"))
-    
-    test_image_paths = glob.glob(os.path.join(test_path, "images", "*.jpg"))
-    test_mask_paths = glob.glob(os.path.join(test_path, "masks", "*.png"))
-    
-    train_data_loader = get_data_loader(image_paths=train_image_paths, mask_paths=train_mask_paths, batch_size=32, shuffle=True, transform=None)
-    test_data_loader = get_data_loader(image_paths=test_image_paths, mask_paths=test_mask_paths, batch_size=32, shuffle=True, transform=None)
+    train_data_loader = get_data_loader(data_dir="/path/to/dir", batch_size=32, shuffle=True, transform=None)
+    test_data_loader = get_data_loader(data_dir="/path/to/dir", batch_size=32, shuffle=True, transform=None)
 
     model = UNet(n_class=20)
     model.to(torch.device('cuda'))
@@ -105,8 +93,9 @@ if parse_folder('data'):
     real_image_paths = glob.glob("data/real_images/images/*.png")
     real_image_paths = glob.glob("data/real_images/images/*.jpeg")
     
-    train_dataloader = get_data_loader('data', 128 )
+    train_dataloader = get_data_loader('data', 128)
     discriminator_model = disc.discriminator
     generator_model = gen.generator
     train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  num_epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
 ```
+
