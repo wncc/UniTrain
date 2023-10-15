@@ -2,9 +2,12 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on:
   push:
+    paths:
+      - '**/setup.py'
     branches:
       - main
       - 'releases/**'
+      
 
 jobs:
   build:

@@ -48,6 +48,7 @@ def get_data_loader(data_dir, batch_size, shuffle=True, transform = None, split=
     dataset = DCGANdataset(data_dir, transform=transform)
 
     # Create a data loader
+
     data_loader = DataLoader(
         dataset,
         batch_size=batch_size,
@@ -166,7 +167,7 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
         i=0
         for real_images, _ in tqdm(train_data_loader):
             # Train discriminator
-            print('epochs',epoch+1,'image',i+1)
+
             i=i+1
             loss_d, real_score, fake_score = train_discriminator(discriminator_model, generator_model, real_images, opt_d,128,128, device='cpu' )
             # Train generator
