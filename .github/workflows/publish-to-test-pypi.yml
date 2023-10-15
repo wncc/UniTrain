@@ -2,10 +2,13 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on:
   push:
+    paths:
+      - '**/setup.py'
     paths-ignore:
       - '**/.gitignore'
       - '**/.github/workflows/**'
       - '**/*.md'
+      
     branches:
       - main
       - 'releases/**'
