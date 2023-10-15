@@ -4,10 +4,7 @@ on:
   push:
     paths:
       - '**/setup.py'
-    paths-ignore:
-      - '**/.gitignore'
-      - '**/.github/workflows/**'
-      - '**/*.md'
+
       
     branches:
       - main
