@@ -1,11 +1,14 @@
 import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from ..dataset.classification import ClassificationDataset
+import sys #remove this line
+sys.path.append("C:\\Users\\Mehul\\Desktop\\IITB\\Unitrain\\UniTrain")
+from UniTrain.dataset.classification import ClassificationDataset #make this ..datset
 import torch.optim as optim
 import torch.nn as nn
 import torch
 import logging
+import tqdm
 
 def get_data_loader(data_dir, batch_size, shuffle=True, transform = None, split='train'):
     """
@@ -115,8 +118,9 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
     for epoch in range(num_epochs):
         model.train()  # Set the model to training mode
         running_loss = 0.0
+        loop = tqdm.tqdm(train_data_loader, total=len(train_data_loader), leave=False)
 
-        for batch_idx, (inputs, labels) in enumerate(train_data_loader):
+        for batch_idx, (inputs, labels) in enumerate(loop):
             optimizer.zero_grad()  # Zero the parameter gradients
 
             inputs = inputs.to(device)
@@ -131,7 +135,8 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
             optimizer.step()
 
             running_loss += loss.item()
-
+            loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
+            loop.set_postfix(loss=loss.item(), acc=evaluate_model(model, test_data_loader))
             if batch_idx % 100 == 99:  # Print and log every 100 batches
                 avg_loss = running_loss / 100
                 if logger:
@@ -170,5 +175,3 @@ def evaluate_model(model, dataloader):
     accuracy = 100 * correct / total
 
     return accuracy
-
-    
