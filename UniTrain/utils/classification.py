@@ -116,7 +116,7 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
     for epoch in range(num_epochs):
         model.train()  # Set the model to training mode
         running_loss = 0.0
-        loop = tqdm.tqdm(train_data_loader, total=len(train_data_loader), leave=False)
+        loop = tqdm.tqdm(train_data_loader, total=len(train_data_loader), leave=True)
 
         for batch_idx, (inputs, labels) in enumerate(loop):
             optimizer.zero_grad()  # Zero the parameter gradients
