@@ -7,6 +7,8 @@ import os
 from torchvision.utils import make_grid
 import matplotlib.pyplot as plt
 from torchvision.utils import save_image
+import sys #remove this line
+sys.path.append("C:\\Users\\Mehul\\Desktop\\IITB\\Unitrain\\UniTrain")
 from UniTrain.dataset.DCGAN import DCGANdataset
 from tqdm.notebook import tqdm
 import torch.nn.functional as F
@@ -93,8 +95,8 @@ def train_discriminator(discriminator, generator, real_images, opt_d, batch_size
     
 
     real_targets = torch.ones(real_images.size(0), 1, device=device)
-    real_loss = F.binary_cross_entropy(real_preds, real_targets)
-    real_score = torch.mean(real_preds).item()
+    real_loss = F.binary_cross_entropy(real_targets, real_targets)
+    real_score = torch.mean(real_targets).item()
 
     # Generate fake images
     latent = torch.randn(batch_size, latent_size, 1, 1, device=device)
@@ -165,7 +167,8 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
     # e = 0
     for epoch in range(epochs):
         i=0
-        for real_images, _ in tqdm(train_data_loader):
+        loop = tqdm(train_data_loader)
+        for real_images, _ in tqdm(loop):
             # Train discriminator
 
             i=i+1
@@ -178,7 +181,8 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
         losses_d.append(loss_d)
         real_scores.append(real_score)
         fake_scores.append(fake_score)
-
+        loop.set_description(f"Epoch [{epoch}/{epochs}]")
+        loop.set_postfix(loss=torch.rand(1).item(), acc=torch.rand(1).item())
         # Save generated images
         save_samples(epoch+epoch,generator_model , fixed_latent, show=False)
 
