@@ -1,9 +1,7 @@
 import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
-import sys #remove this line
-sys.path.append("C:\\Users\\Mehul\\Desktop\\IITB\\Unitrain\\UniTrain")
-from UniTrain.dataset.classification import ClassificationDataset #make this ..datset
+from ..dataset.classification import ClassificationDataset
 import torch.optim as optim
 import torch.nn as nn
 import torch
@@ -136,13 +134,7 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
 
             running_loss += loss.item()
             loop.set_description(f"Epoch [{epoch}/{num_epochs}]")
-            loop.set_postfix(loss=loss.item(), acc=evaluate_model(model, test_data_loader))
-            if batch_idx % 100 == 99:  # Print and log every 100 batches
-                avg_loss = running_loss / 100
-                if logger:
-                    logger.info(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}')
-                print(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}')
-                running_loss = 0.0
+            loop.set_postfix(loss=loss.item(), test_acc=evaluate_model(model, test_data_loader))
 
         # Save model checkpoint if accuracy improves
         accuracy = evaluate_model(model, test_data_loader)
