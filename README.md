@@ -96,6 +96,6 @@ if parse_folder('data'):
     train_dataloader = get_data_loader('data', 128)
     discriminator_model = disc.discriminator
     generator_model = gen.generator
-    train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  num_epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
+    train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
 ```
 
