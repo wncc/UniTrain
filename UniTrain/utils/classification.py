@@ -170,5 +170,3 @@ def evaluate_model(model, dataloader):
     accuracy = 100 * correct / total
 
     return accuracy
-
-    
