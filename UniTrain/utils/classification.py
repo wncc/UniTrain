@@ -108,8 +108,9 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, optimize
                         datefmt='%Y-%m-%d %H:%M:%S', filename=logger, filemode='w')
         logger = logging.getLogger(__name__)
 
-    # Initialize optimizer and accuracy
+    # Initialize optimizer, loss and accuracy
     optimizer = optimizer(model.parameters(), lr=learning_rate)
+    loss_criterion = loss_criterion()
     best_accuracy = 0.0
 
     # Training loop
