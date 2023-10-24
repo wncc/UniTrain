@@ -6,6 +6,8 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 import logging
+import tqdm
+from PIL import Image
 
 def get_data_loader(data_dir, batch_size, shuffle=True, transform = None, split='train'):
     """
@@ -115,8 +117,9 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
     for epoch in range(num_epochs):
         model.train()  # Set the model to training mode
         running_loss = 0.0
+        loop = tqdm.tqdm(train_data_loader, total=len(train_data_loader))
 
-        for batch_idx, (inputs, labels) in enumerate(train_data_loader):
+        for batch_idx, (inputs, labels) in enumerate(loop):
             optimizer.zero_grad()  # Zero the parameter gradients
 
             inputs = inputs.to(device)
@@ -131,16 +134,16 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
             optimizer.step()
 
             running_loss += loss.item()
-
+            loop.set_description(f"Epoch [{epoch+1}/{num_epochs}]")
+            loop.set_postfix(loss= running_loss / (batch_idx + 1))
             if batch_idx % 100 == 99:  # Print and log every 100 batches
                 avg_loss = running_loss / 100
                 if logger:
                     logger.info(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}')
-                print(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}')
-                running_loss = 0.0
 
         # Save model checkpoint if accuracy improves
         accuracy = evaluate_model(model, test_data_loader)
+
         if logger:
             logger.info(f'Epoch {epoch + 1}, Validation Accuracy: {accuracy:.2f}%')
 
@@ -171,4 +174,44 @@ def evaluate_model(model, dataloader):
 
     return accuracy
 
+def infer_class(model: nn.Module, image_path: str, device: torch.device, dataloader: DataLoader) -> str:
+    """Perform inference on a single image.
+
+    Args:
+        model (nn.Module): Model to perform inference with.
+        image_path (str): Path to image to perform inference on.    
+        device (torch.device): Device to run inference on (GPU or CPU).
+        dataloader (DataLoader): Data loader for the dataset.
+
+    Returns:
+        str: Predicted class.
+    """
+    model.eval()  # Set model to evaluation mode
+
+    transform = dataloader.dataset.transform
+
+    # Define transformations for the image
+    if transform is None:
+        transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406),
+                                 (0.229, 0.224, 0.225))
+        ])
+
+    image = Image.open(image_path).convert('RGB')
+
+    image_tensor = transform(image)
+
+    # Add an extra batch dimension since pytorch treats all images as batches
+    image_tensor = image_tensor.unsqueeze_(0)
     
+    with torch.no_grad():
+        output = model(image_tensor.to(device))
+
+    # Post-process the prediction
+    _, predicted = torch.max(output.data, 1)
+
+    classes = dataloader.dataset.classes
+
+    return classes[predicted]
