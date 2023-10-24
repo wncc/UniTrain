@@ -199,3 +199,4 @@ def evaluate_model(discriminator_model, dataloader):
     accuracy = 100 * correct / total
 
     return accuracy
+

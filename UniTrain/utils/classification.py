@@ -136,6 +136,10 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
             running_loss += loss.item()
             loop.set_description(f"Epoch [{epoch+1}/{num_epochs}]")
             loop.set_postfix(loss= running_loss / (batch_idx + 1))
+            if batch_idx % 100 == 99:  # Print and log every 100 batches
+                avg_loss = running_loss / 100
+                if logger:
+                    logger.info(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}')
 
         # Save model checkpoint if accuracy improves
         accuracy = evaluate_model(model, test_data_loader)
