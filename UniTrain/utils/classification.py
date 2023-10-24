@@ -174,6 +174,7 @@ def evaluate_model(model, dataloader):
 
     return accuracy
 
+
 def infer_class(model: nn.Module, image_path: str, device: torch.device, dataloader: DataLoader) -> str:
     """Perform inference on a single image.
 
@@ -215,3 +216,4 @@ def infer_class(model: nn.Module, image_path: str, device: torch.device, dataloa
     classes = dataloader.dataset.classes
 
     return classes[predicted]
+
