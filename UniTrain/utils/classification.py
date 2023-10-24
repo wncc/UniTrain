@@ -1,7 +1,8 @@
 import os
+import UniTrain
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from ..dataset.classification import ClassificationDataset
+from UniTrain.dataset.classification import ClassificationDataset
 import torch.optim as optim
 import torch.nn as nn
 import torch
@@ -84,13 +85,15 @@ def parse_folder(dataset_path):
         print("An error occurred:", str(e))
         return None
 
-def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
+def train_model(model, train_data_loader, test_data_loader, num_epochs, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
     '''Train a PyTorch model for a classification task.
     Args:
     model (nn.Module): Torch model to train.
     train_data_loader (DataLoader): Training data loader.
     test_data_loader (DataLoader): Testing data loader.
     num_epochs (int): Number of epochs to train the model for.
+    optimizer (torch.optim): Optimizer used.
+    loss_criterion (torch.nn): Criterion to calculate loss.(Also called Cost/Loss function)
     learning_rate (float): Learning rate for the optimizer.
     checkpoint_dir (str): Directory to save model checkpoints.
     logger (Logger): Logger to log training details.
@@ -105,10 +108,8 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
                         datefmt='%Y-%m-%d %H:%M:%S', filename=logger, filemode='w')
         logger = logging.getLogger(__name__)
 
-    # Define loss function and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
+    # Initialize optimizer and accuracy
+    optimizer = optimizer(model.parameters(), lr=learning_rate)
     best_accuracy = 0.0
 
     # Training loop
@@ -124,7 +125,7 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
 
             # Forward pass
             outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            loss = loss_criterion(outputs, labels)
 
             # Backward pass and optimization
             loss.backward()
