@@ -88,8 +88,8 @@ def parse_folder(dataset_path):
         return False
 
 
-def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, logger=None, iou=False, device=torch.device('cpu')) -> None:
-    '''Train the model using the given train and test data loaders.
+def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
+
     
     Args: 
     model (nn.Module): PyTorch model to train.
@@ -112,8 +112,8 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
         logger = logging.getLogger(__name__)
 
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    loss_criterion = loss_criterion()
+    optimizer = optimizer(model.parameters(), lr=learning_rate)
 
     best_loss = float('inf')
 
@@ -128,7 +128,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
             targets = targets.squeeze(1)
             outputs.to(device)
             targets.to(device)
-            loss = criterion(outputs, targets)
+            loss = loss_criterion(outputs, targets)
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -152,7 +152,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
                 targets = targets.squeeze(1)
                 outputs.to(device)
                 targets.to(device)
-                loss = criterion(outputs, targets)
+                loss = loss_criterion(outputs, targets)
                 val_loss += loss.item()
                 iou_score_mean += iou_score(outputs, targets)
 
