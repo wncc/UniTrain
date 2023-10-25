@@ -88,7 +88,9 @@ def parse_folder(dataset_path):
         return None
 
 
+
 def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, criterion_fn = nn.CrossEntropyLoss, optimizer_fn = optim.Adam, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
+
 
     '''Train a PyTorch model for a classification task.
     Args:
@@ -116,11 +118,11 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
         logger = logging.getLogger(__name__)
 
 
+
     # Setting the optimizer and criterion
     optimizer = optimizer_fn(model.parameters(), lr=learning_rate)
     criterion = criterion_fn()
     
-
 
 
     # Initialize optimizer, loss and accuracy
