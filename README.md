@@ -15,7 +15,7 @@ UniTrain is an open-source, unified platform for effortless machine learning mod
 ## Training  
 ### Classification  
 **Adding Data for Training**  
-- Create a 'data' folder within a 'content' folder.  
+- Create a 'data' folder.  
 - The 'data' folder will contain three different folders named 'train', 'test', and 'eval' used for training, testing, and evaluation purposes.  
 - Each of the 'train', 'test', and 'eval' folders contain data sets of different categories on which you want to use your model  
 - Data folder structure 'content'->'data'->('train', 'test', 'eval')->(category1, category2, category3, .....)
@@ -30,7 +30,7 @@ from UniTrain.models.classification import ResNet9
 from UniTrain.utils.classification import parse_folder
 import torch
 
-if parse_folder("/content/data/"):
+if parse_folder("data"):
   train_dataloader = get_data_loader("/path/to/dir", 32, True, split='train')
   test_dataloader = get_data_loader("/path/to/dir", 32, True, split='test')
 
