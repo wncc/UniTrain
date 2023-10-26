@@ -93,6 +93,7 @@ def train_discriminator(discriminator, generator, real_images, opt_d, batch_size
     
 
     real_targets = torch.ones(real_images.size(0), 1, device=device)
+    real_preds = discriminator(real_images)
     real_loss = F.binary_cross_entropy(real_preds, real_targets)
     real_score = torch.mean(real_preds).item()
 
