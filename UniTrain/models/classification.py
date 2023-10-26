@@ -1,5 +1,5 @@
-import torch
 import torch.nn as nn
+
 
 # Define the ResNet-9 model in a single class
 class ResNet9(nn.Module):
@@ -27,15 +27,31 @@ class ResNet9(nn.Module):
         layers.append(self.build_residual_block(self.in_channels, out_channels, stride))
         self.in_channels = out_channels
         for _ in range(1, num_blocks):
-            layers.append(self.build_residual_block(self.in_channels, out_channels, stride=1))
+            layers.append(
+                self.build_residual_block(self.in_channels, out_channels, stride=1)
+            )
         return nn.Sequential(*layers)
 
     def build_residual_block(self, in_channels, out_channels, stride):
         return nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False),
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size=3,
+                stride=stride,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(
+                out_channels,
+                out_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
         )
 
