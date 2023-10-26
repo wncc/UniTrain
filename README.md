@@ -38,7 +38,7 @@ if parse_folder("/content/data/"):
   model.to(torch.device('cuda'))
 
   train_model(model, train_dataloader, test_dataloader,
-              num_epochs=10, learning_rate=1e-3, checkpoint_dir='checkpoints',logger = "training.log", device=torch.device('cuda'))
+              num_epochs=10,optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, learning_rate=1e-3, checkpoint_dir='checkpoints',logger = "training.log", device=torch.device('cuda'))
 ```
 
 ### Segmentation  
@@ -69,7 +69,7 @@ if parse_folder(data_dir):
     
     generate_model_summary(model=model, input_size=(3, 512, 512))
     
-    train_unet( model, train_data_loader, test_data_loader, num_epochs=10, learning_rate=1e-3, checkpoint_dir='checkpoints', logger="training.log",iou=False, device=torch.device('cuda'))
+    train_unet( model, train_data_loader, test_data_loader, num_epochs=10, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, learning_rate=1e-3, checkpoint_dir='checkpoints', logger="training.log",iou=False, device=torch.device('cuda'))
 ```
 
 ### DCGAN
