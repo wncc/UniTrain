@@ -114,5 +114,4 @@ if parse_folder('data'):
     generator_model = gen.generator
 
     train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
-
 ```

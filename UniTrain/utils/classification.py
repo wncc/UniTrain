@@ -107,6 +107,7 @@ def train_model(
     device=torch.device("cpu"),
 ):
     """Train a PyTorch model for a classification task.
+    
     Args:
     model (nn.Module): Torch model to train.
     train_data_loader (DataLoader): Training data loader.
