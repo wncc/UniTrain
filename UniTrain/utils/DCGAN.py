@@ -11,6 +11,32 @@ from UniTrain.dataset.DCGAN import DCGANdataset
 from tqdm.notebook import tqdm
 import torch.nn.functional as F
 
+# #wandb-logging-method-1
+# import wandb
+# wandb.login()
+
+# n_experiments = 1
+# def def_config(epochs = 10, batch_size = 128, learning_rate = 1e-3):
+#       return {"epochs": epochs, "batch_size": batch_size, "lr": learning_rate}
+
+# wandb.init(
+#     project = "UniTrain-classification",
+#     config = def_config(),
+#   )
+# config = wandb.config
+
+#Method 1 has been commented out because it is more verbose 
+#But it is highly modular and should be used to make a better logger
+
+#Method 2 is mostly for beginner to get a hang of how logging would work
+#wandb-logging-method-2
+#automatically detects the model and logs
+import wandb
+from wandb.keras import WandbCallback
+
+wandb.init(project = "Transfer-Learning Tut",
+    config={"hyper": "parameter"})
+
 latent_size = 128
 stats = (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)
 
@@ -177,12 +203,13 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
         losses_d.append(loss_d)
         real_scores.append(real_score)
         fake_scores.append(fake_score)
-        
+        #uncommment to use wandb-logging-method-1
+        # wandb.log({"loss_g": loss_g,"loss_d": loss_d, "real_score": real_score, "fake_score": fake_score })
         # Save generated images
         save_samples(epoch+epoch,generator_model , fixed_latent, show=False)
 
     print('Finished Training')
-    
+    wandb.finish()
 
 def evaluate_model(discriminator_model, dataloader):
     discriminator_model.eval()  # Set the model to evaluation mode
