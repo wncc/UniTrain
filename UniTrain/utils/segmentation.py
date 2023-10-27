@@ -89,6 +89,10 @@ def parse_folder(dataset_path):
 
 
 
+# <<<<<<< main
+# =======
+
+# >>>>>>> stg-dev
 def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
 
     Args: 
