@@ -51,8 +51,8 @@ class ResNet9(nn.Module):
         x = self.avg_pool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
-        return x
-        
+
+ #ResNet50 functionality addition       
 class ResNet9_50(nn.Module):
     def __init__(self, num_classes):
         super(ResNet9_50, self).__init__()
@@ -61,8 +61,29 @@ class ResNet9_50(nn.Module):
         self.resnet50 = models.resnet50(pretrained=True)
 
     def forward(self, x):
-         x1 = self.resnet9(x)
-         x2 = self.resnet50(x)
-         x = x1 + x2
-         return x
+         x = self.resnet50(x)
+#GoogLeNet functionality addition
+import torch
+import torch.nn as nn
+import torchvision.models as models
+
+class GoogleNetModel(nn.Module):
+    def __init__(self, num_classes):
+        super(GoogleNetModel, self).__init()
+        
+        # Load the pre-trained GoogleNet model
+        self.googlenet = models.inception_v3(pretrained=True)
+        
+        # Modify the classification head to match the number of classes in your dataset
+        num_ftrs = self.googlenet.fc.in_features
+        self.googlenet.fc = nn.Linear(num_ftrs, num_classes)
+
+    def forward(self, x):
+        # Pass input through the GoogleNet model
+        x1 = self.googlenet(x)
+        x2 = self.resnet50(x)
+        x3 = self.resnet9(x)
+        x = x1 + x2 + x3
+        return x
+
 
