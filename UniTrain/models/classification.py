@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchvision
 
 # Define the ResNet-9 model in a single class
 class ResNet9(nn.Module):
@@ -51,3 +52,31 @@ class ResNet9(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
         return x
+
+# Making a custom transfer learning model
+def create_transfer_learning_model(num_classes, model = torchvision.models.resnet18, feature_extract=True, use_pretrained=True):
+    """
+    Create a transfer learning model with a custom output layer.
+    
+    Args:
+        num_classes (int): Number of classes in the custom output layer.
+        model(torchvision.models.<ModelName>): Pre-trained model you want to use.
+        feature_extract (bool): If True, freeze the pre-trained model's weights.
+        use_pretrained (bool): If True, use pre-trained weights.
+
+    Returns:
+        model: A PyTorch model ready for transfer learning.
+    """
+    # Load a pre-trained model, for example, ResNet-18
+    model = model(pretrained=use_pretrained)
+    
+    # Freeze the pre-trained weights if feature_extract is True
+    if feature_extract:
+        for param in model.parameters():
+            param.requires_grad = False
+    
+    # Modify the output layer to match the number of classes
+    num_features = model.fc.in_features
+    model.fc = nn.Linear(num_features, num_classes)
+    
+    return model
