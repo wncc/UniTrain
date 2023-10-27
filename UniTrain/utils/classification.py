@@ -87,11 +87,16 @@ def parse_folder(dataset_path):
         print("An error occurred:", str(e))
         return None
 
+# <<<<<<< feature1
+def train_model(model, train_data_loader, test_data_loader, num_epochs, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, learning_rate=0.001, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
+# =======
 
 
-def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, criterion_fn = nn.CrossEntropyLoss, optimizer_fn = optim.Adam, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
+
+# def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, criterion_fn = nn.CrossEntropyLoss, optimizer_fn = optim.Adam, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
 
 
+# >>>>>>> stg-dev
     '''Train a PyTorch model for a classification task.
     Args:
     model (nn.Module): Torch model to train.
@@ -117,14 +122,14 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
                         datefmt='%Y-%m-%d %H:%M:%S', filename=logger, filemode='w')
         logger = logging.getLogger(__name__)
 
+# <<<<<<< feature1
 
-
+# >>>>>>> stg-dev
     # Setting the optimizer and criterion
     optimizer = optimizer_fn(model.parameters(), lr=learning_rate)
     criterion = criterion_fn()
     
-
-
+# >>>>>>> stg-dev
     # Initialize optimizer, loss and accuracy
     optimizer = optimizer(model.parameters(), lr=learning_rate)
     loss_criterion = loss_criterion()

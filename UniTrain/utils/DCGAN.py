@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 import torchvision.transforms as T
 import torch
+from tqdm import tqdm
 import os
 from torchvision.utils import make_grid
 import matplotlib.pyplot as plt
@@ -146,10 +147,10 @@ def save_samples(index, generator_model, latent_tensors, show=True):
         ax.imshow(make_grid(fake_images.cpu().detach(), nrow=8).permute(1, 2, 0))
 
 
-def train_model(discriminator_model, generator_model, train_data_loader , batch_size, epochs, learning_rate, checkpoint_dir , device= torch.device('cpu') ,logger=None, iou=False, ):
+def train_model(discriminator_model, generator_model, train_data_loader, batch_size, epochs, learning_rate, checkpoint_dir, device=torch.device('cpu'), logger=None, iou=False):
 
-    os.makedirs(checkpoint_dir + "/discriminator_checkpoint" , exist_ok=True)
-    os.makedirs(checkpoint_dir + "/generator_checkpoint" , exist_ok=True)
+    os.makedirs(checkpoint_dir + "/discriminator_checkpoint", exist_ok=True)
+    os.makedirs(checkpoint_dir + "/generator_checkpoint", exist_ok=True)
 
     fixed_latent = torch.randn(128, latent_size, 1, 1, device=device)
 
@@ -163,16 +164,20 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
     opt_d = torch.optim.Adam(discriminator_model.parameters(), lr=learning_rate, betas=(0.5, 0.999))
     opt_g = torch.optim.Adam(generator_model.parameters(), lr=learning_rate, betas=(0.5, 0.999))
 
-    # e = 0
     for epoch in range(epochs):
-        i=0
-        for real_images, _ in tqdm(train_data_loader):
-            # Train discriminator
+        i = 0
+        progress_bar = tqdm(train_data_loader, desc=f'Epoch {epoch + 1}/{epochs}', leave=False, dynamic_ncols=True)
 
-            i=i+1
-            loss_d, real_score, fake_score = train_discriminator(discriminator_model, generator_model, real_images, opt_d,128,128, device='cpu' )
+        for real_images, _ in progress_bar:
+            # Train discriminator
+            i += 1
+            loss_d, real_score, fake_score = train_discriminator(discriminator_model, generator_model, real_images, opt_d, 128, 128, device='cpu')
             # Train generator
             loss_g = train_generator(opt_g, discriminator_model, generator_model, batch_size, device='cpu')
+
+            progress_bar.set_postfix({'Loss D': loss_d, 'Loss G': loss_g, 'Real Score': real_score, 'Fake Score': fake_score})
+        
+        progress_bar.close()
 
         # Record losses & scores
         losses_g.append(loss_g)
@@ -181,9 +186,10 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
         fake_scores.append(fake_score)
 
         # Save generated images
-        save_samples(epoch+epoch,generator_model , fixed_latent, show=False)
+        save_samples(epoch + epoch, generator_model, fixed_latent, show=False)
 
     print('Finished Training')
+
 
 def evaluate_model(discriminator_model, dataloader):
     discriminator_model.eval()  # Set the model to evaluation mode
