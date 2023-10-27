@@ -88,9 +88,11 @@ def parse_folder(dataset_path):
         return False
 
 
+
 def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
     '''Train the model using the given train and test data loaders.
     
+
     Args: 
     model (nn.Module): PyTorch model to train.
     train_data_loader (DataLoader): Data loader of the training dataset.
@@ -105,6 +107,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
     Returns:
     None
     '''
+
 
     if logger:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - Epoch %(epoch)d - Train Acc: %(train_acc).4f - Val Acc: %(val_acc).4f - %(message)s',
