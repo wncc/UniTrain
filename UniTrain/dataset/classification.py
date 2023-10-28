@@ -1,8 +1,9 @@
-import os
 import glob
+import os
+
 from PIL import Image
-import torch
 from torch.utils.data import Dataset
+
 
 class ClassificationDataset(Dataset):
     def __init__(self, data_dir, transform=None):
@@ -18,9 +19,11 @@ class ClassificationDataset(Dataset):
             class_path = os.path.join(self.data_dir, cls)
             class_idx = self.class_to_idx[cls]
             # Include .jpg, .jpeg, and .png extensions in the glob pattern
-            for file_path in glob.glob(os.path.join(class_path, '*.jpg')) + \
-                             glob.glob(os.path.join(class_path, '*.jpeg')) + \
-                             glob.glob(os.path.join(class_path, '*.png')):
+            for file_path in (
+                glob.glob(os.path.join(class_path, "*.jpg"))
+                + glob.glob(os.path.join(class_path, "*.jpeg"))
+                + glob.glob(os.path.join(class_path, "*.png"))
+            ):
                 data.append((file_path, class_idx))
         return data
 
@@ -29,7 +32,7 @@ class ClassificationDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path, target = self.data[idx]
-        image = Image.open(img_path).convert('RGB')
+        image = Image.open(img_path).convert("RGB")
 
         if self.transform is not None:
             image = self.transform(image)

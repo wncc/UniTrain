@@ -1,8 +1,8 @@
-import torch
 import torch.nn as nn
 import torchvision
 import torch.nn.functional as F
 import torchvision.models as models
+
 
 class ResNet101(nn.Module):
     def __init__(self, num_classes):
@@ -53,7 +53,7 @@ class ResNet101(nn.Module):
 
         return y
     
-    
+
 # Define the ResNet-9 model in a single class
 class ResNet9(nn.Module):
     def __init__(self, num_classes):
@@ -80,15 +80,31 @@ class ResNet9(nn.Module):
         layers.append(self.build_residual_block(self.in_channels, out_channels, stride))
         self.in_channels = out_channels
         for _ in range(1, num_blocks):
-            layers.append(self.build_residual_block(self.in_channels, out_channels, stride=1))
+            layers.append(
+                self.build_residual_block(self.in_channels, out_channels, stride=1)
+            )
         return nn.Sequential(*layers)
 
     def build_residual_block(self, in_channels, out_channels, stride):
         return nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False),
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size=3,
+                stride=stride,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(
+                out_channels,
+                out_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
         )
 
@@ -219,7 +235,7 @@ class ResNet34(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
         return x
-# <<<<<<< deepak
+
 
 
 class ResNet50(nn.Module):
