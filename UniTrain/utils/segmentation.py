@@ -91,7 +91,7 @@ def parse_folder(dataset_path):
 
 
 def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
-
+    '''
     Args: 
     model (nn.Module): PyTorch model to train.
     train_data_loader (DataLoader): Data loader of the training dataset.
