@@ -105,3 +105,6 @@ if parse_folder('data'):
 
 ```
 
+# Contributing
+
+Check out [contribution.md](contribution.md) for guidelines on contributing to the repo.
