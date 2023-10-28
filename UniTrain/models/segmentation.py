@@ -181,3 +181,82 @@ class SegNet(nn.Module):
         x = self.stage5_decoder(x)
 
         return x
+
+class VGGNet(nn.Module):
+    def __init__(self, n_class):
+        super(VGGNet, self).__init()
+        
+        # Encoder
+        # VGG-like convolutional blocks
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            
+            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            
+            nn.Conv2d(512, 1024, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(1024, 1024, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2),
+            nn.Conv2d(1024, 512, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            
+            nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),
+            nn.Conv2d(512, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            
+            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),
+            nn.Conv2d(256, 128, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            
+            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),
+            nn.Conv2d(128, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+
+        # Output layer
+        self.outconv = nn.Conv2d(64, n_class, kernel_size=1)
+    
+    def forward(self, x):
+        # Encoder
+        xe = self.encoder(x)
+        
+        # Decoder
+        xd = self.decoder(xe)
+        
+        # Output layer
+        out = self.outconv(xd)
+
+        return out
