@@ -1,9 +1,9 @@
-import os
-from PIL import Image
-import torch
-from torch.utils.data import Dataset
 import cv2
+import torch
 import torchvision.transforms as transforms
+from PIL import Image
+from torch.utils.data import Dataset
+
 
 class SegmentationDataset(Dataset):
     def __init__(self, image_paths: list, mask_paths: list, transform=None):
@@ -21,18 +21,20 @@ class SegmentationDataset(Dataset):
 
         print(image_path)
 
-        image = Image.open(image_path).convert('RGB')
-        mask = Image.open(mask_path).convert('L')
+        image = Image.open(image_path).convert("RGB")
+        mask = Image.open(mask_path).convert("L")
 
         img = cv2.imread(image_path)
 
         if self.transform is not None:
             image = self.transform(image)
-            
-        mask_transform = transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor()])
+
+        mask_transform = transforms.Compose(
+            [transforms.Resize((224, 224)), transforms.ToTensor()]
+        )
         mask = mask_transform(mask)
         mask = mask.to(torch.long)
-        
+
         # You may need to further preprocess the mask if required
         # Example: Convert mask to tensor and perform class mapping
         return image, mask
