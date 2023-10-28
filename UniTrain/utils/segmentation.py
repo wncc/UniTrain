@@ -5,10 +5,11 @@ import torch.optim as optim
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from ..dataset.segmentation import SegmentationDataset
+from UniTrain.dataset.segmentation import SegmentationDataset
 import torchsummary
 import logging
 import glob
+import wandb  # Import Weights and Biases
 
 def get_data_loader(data_dir: str, batch_size:int, shuffle:bool=True, transform=None, split='train') -> DataLoader:
     """,
@@ -46,14 +47,48 @@ def get_data_loader(data_dir: str, batch_size:int, shuffle:bool=True, transform=
     return data_loader
 
 def parse_folder(dataset_path):
-    '''Parse the dataset folder and return True if the folder structure is valid, False otherwise.
+    # '''Parse the dataset folder and return True if the folder structure is valid, False otherwise.
 
-    Args:
-    dataset_path (str): Path to the dataset folder.
+    # Args:
+    # dataset_path (str): Path to the dataset folder.
 
-    Returns:
-    bool: Whether the dataset folder is valid.
-    '''
+
+    # Returns:
+    # bool: Whether the dataset folder is valid.
+    # '''
+    wandb.init(project="your_project_name", config={"num_epochs": num_epochs, "learning_rate": learning_rate})
+
+    for epoch in range(num_epochs):
+        model.train()
+        train_loss = 0.0
+        iou_score_mean = 0.0
+
+        for inputs, targets in tqdm(train_data_loader, desc=f'Epoch {epoch + 1}/{num_epochs}', leave=False):
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            targets = targets.squeeze(1)
+            outputs.to(device)
+            targets.to(device)
+            loss = loss_criterion(outputs, targets)
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.item()
+            iou_score_mean += iou_score(outputs, targets)
+
+        # Log training loss and IOU to wandb
+        wandb.log({"train_loss": train_loss, "iou_score": iou_score_mean})
+    with torch.no_grad():
+            for inputs, targets in tqdm(test_data_loader, desc=f'Validation', leave=False):
+                outputs = model(inputs)
+                targets = targets.squeeze(1)
+                outputs.to(device)
+                targets.to(device)
+                loss = loss_criterion(outputs, targets)
+                val_loss += loss.item()
+                iou_score_mean += iou_score(outputs, targets)
+
+        # Log validation loss and IOU to wandb
+        wandb.log({"val_loss": average_val_loss, "val_iou_score": iou_score_mean})
     try:
         if os.path.exists(dataset_path):
             # Store paths to train, test, and eval folders if they exist
@@ -92,8 +127,8 @@ def parse_folder(dataset_path):
 
 def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
 
-    Args: 
-    model (nn.Module): PyTorch model to train.
+    # Args: 
+    model (nn.Module): 
     train_data_loader (DataLoader): Data loader of the training dataset.
     test_data_loader (DataLoader): Data loader of the test dataset.
     num_epochs (int): Number of epochs to train the model.
@@ -105,7 +140,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
 
     Returns:
     None
-    '''
+    # '''
 
 
     if logger:
@@ -177,7 +212,9 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
     print('Finished Training')
 
 def generate_model_summary(model, input_size):
-    '''Generate a summary of the model.'''
+
+  
+      
     torchsummary.summary(model, input_size=input_size)
 
 def iou_score(output, target):
@@ -187,7 +224,19 @@ def iou_score(output, target):
     target (torch.Tensor): Target masks of shape (N x H x W).
 
     Returns:
+
     float: The average IoU score.
+    if __name__ == "__main__":
+    data_dir = "/path/to/your/data"  # Update with your data path
+    train_data_loader = get_data_loader(data_dir=data_dir, batch_size=32, shuffle=True, transform=None)
+    test_data_loader = get_data_loader(data_dir=data_dir, batch_size=32, shuffle=True, transform=None)
+
+    model = UNet(n_class=20)
+    model.to(torch.device('cuda'))
+
+    generate_model_summary(model=model, input_size=(3, 512, 512))
+
+    train_unet(model, train_data_loader, test_data_loader, num_epochs=10, learning_rate=1e-3, checkpoint_dir='checkpoints', iou=False, device=torch.device('cuda'))
     '''
     smooth = 1e-6
     output = output.argmax(1)
@@ -195,3 +244,4 @@ def iou_score(output, target):
     union = (output | target).float().sum((1, 2))
     iou = (intersection + smooth) / (union + smooth)
     return iou.mean().item()
+    
