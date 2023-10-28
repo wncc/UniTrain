@@ -105,37 +105,6 @@ if parse_folder('data'):
 
 ```
 
-### Segmentation  
-**Adding Data for Training**  
-- Create a 'data' folder.  
-- The 'data' folder will contain three different folders named 'train', 'test', and 'eval' used for training, testing, and evaluation purposes.  
-- Each of the 'train', 'test', and 'eval' folders contain data sets of 'images' and 'masks'. 
-- Data folder structure 'content'->'data'->('train', 'test', 'eval')->('images', 'masks').
-    
-**Training the model**  
-- Run the following code to train your model and you can change the default arguments with your custom arguments  
-
-```
-import UniTrain
-from UniTrain.utils.segmentation import get_data_loader, train_model, generate_model_summary
-from UniTrain.models.segmentation import UNet
-from UniTrain.utils.segmentation import parse_folder
-import torch
-
-
-if parse_folder(data_dir):    
-    
-    train_data_loader = get_data_loader(data_dir="/path/to/dir", batch_size=32, shuffle=True, transform=None)
-    test_data_loader = get_data_loader(data_dir="/path/to/dir", batch_size=32, shuffle=True, transform=None)
-
-    model = UNet(n_class=20)
-    model.to(torch.device('cuda'))
-    
-    generate_model_summary(model=model, input_size=(3, 512, 512))
-    
-    train_unet( model, train_data_loader, test_data_loader, num_epochs=10, learning_rate=1e-3, checkpoint_dir='checkpoints', logger="training.log",iou=False, device=torch.device('cuda'))
-```
-
 ### StyleTransfer
 
 **Adding Data for Training**  
@@ -161,7 +130,7 @@ if parse_folder('data'):
 
     assert style_img.size() == content_img.size(), \
     "we need to import style and content images of the same size"
-    
+
     input_img = content_img.clone()
     cnn = vgg19(weights = "VGG19_Weights.DEFAULT").features.eval()
     output = run_style_transfer(cnn, content_img, style_img, input_img)
