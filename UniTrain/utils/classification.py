@@ -108,6 +108,7 @@ def train_model(
 ):
     """Train a PyTorch model for a classification task.
     
+
     Args:
     model (nn.Module): Torch model to train.
     train_data_loader (DataLoader): Training data loader.
@@ -137,9 +138,11 @@ def train_model(
         )
         logger = logging.getLogger(__name__)
 
+
     # Setting the optimizer and criterion
     optimizer = optimizer_fn(model.parameters(), lr=learning_rate)
     criterion = criterion_fn()
+
 
     # Initialize optimizer, loss and accuracy
     optimizer = optimizer(model.parameters(), lr=learning_rate)

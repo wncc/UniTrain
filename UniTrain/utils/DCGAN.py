@@ -8,9 +8,16 @@ import torchvision.transforms as T
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision.utils import make_grid, save_image
+import torchvision.transforms as T
+import torch
+from tqdm import tqdm
+import os
+from torchvision.utils import make_grid
+import matplotlib.pyplot as plt
+from torchvision.utils import save_image
+from UniTrain.dataset.DCGAN import DCGANdataset
 from tqdm.notebook import tqdm
 
-from UniTrain.dataset.DCGAN import DCGANdataset
 
 latent_size = 128
 stats = (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)
@@ -169,6 +176,7 @@ def train_model(
     logger=None,
     iou=False,
 ):
+
     os.makedirs(checkpoint_dir + "/discriminator_checkpoint", exist_ok=True)
     os.makedirs(checkpoint_dir + "/generator_checkpoint", exist_ok=True)
 
@@ -188,9 +196,9 @@ def train_model(
         generator_model.parameters(), lr=learning_rate, betas=(0.5, 0.999)
     )
 
-    # e = 0
     for epoch in range(epochs):
         i = 0
+
         for real_images, _ in tqdm(train_data_loader):
             # Train discriminator
 
@@ -204,10 +212,22 @@ def train_model(
                 128,
                 device="cpu",
             )
+
+        progress_bar = tqdm(train_data_loader, desc=f'Epoch {epoch + 1}/{epochs}', leave=False, dynamic_ncols=True)
+
+        for real_images, _ in progress_bar:
+            # Train discriminator
+            i += 1
+            loss_d, real_score, fake_score = train_discriminator(discriminator_model, generator_model, real_images, opt_d, 128, 128, device='cpu')
+
             # Train generator
             loss_g = train_generator(
                 opt_g, discriminator_model, generator_model, batch_size, device="cpu"
             )
+
+            progress_bar.set_postfix({'Loss D': loss_d, 'Loss G': loss_g, 'Real Score': real_score, 'Fake Score': fake_score})
+        
+        progress_bar.close()
 
         # Record losses & scores
         losses_g.append(loss_g)
@@ -218,7 +238,7 @@ def train_model(
         # Save generated images
         save_samples(epoch + epoch, generator_model, fixed_latent, show=False)
 
-    print("Finished Training")
+
 
 
 def evaluate_model(discriminator_model, dataloader):
