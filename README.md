@@ -116,3 +116,8 @@ if parse_folder('data'):
 
     train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
 ```
+
+# Contributing
+
+Check out [contribution.md](contribution.md) for guidelines on contributing to the repo.
+
