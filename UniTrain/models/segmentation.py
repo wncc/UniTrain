@@ -181,6 +181,7 @@ class SegNet(nn.Module):
         x = self.stage5_decoder(x)
 
         return x
+
 class UNet(nn.Module):
     def __init__(self, n_class):
         super().__init__()
@@ -279,5 +280,4 @@ class UNet(nn.Module):
         # Output layer
         out = self.outconv(xd42)
 
-        return out
-    
+        return out    
