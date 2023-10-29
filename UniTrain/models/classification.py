@@ -387,3 +387,34 @@ class DenseNet(nn.Module):
         x = self.fc(x)
         return x
 
+class LightVisionTransformer(nn.Module):
+    def __init__(self, image_size=224, patch_size=16, num_classes=1000, dim=256, depth=6, heads=4, mlp_dim=512, dropout=0.1):
+        super(LightVisionTransformer, self).__init()
+
+        num_patches = (image_size // patch_size) ** 2
+        patch_dim = 3 * patch_size * patch_size  # 3 for RGB channels
+
+        # Patch embedding layer
+        self.patch_embedding = nn.Conv2d(3, dim, kernel_size=patch_size, stride=patch_size)
+        self.positional_embedding = nn.Parameter(torch.randn(1, num_patches + 1, dim))
+        self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
+        self.transformer = nn.Transformer(
+            d_model=dim,
+            nhead=heads,
+            num_encoder_layers=depth,
+            dim_feedforward=mlp_dim,
+            dropout=dropout,
+        )
+        self.fc = nn.Linear(dim, num_classes)
+
+    def forward(self, x):
+        B, C, H, W = x.shape
+        x = self.patch_embedding(x)
+        x = x.permute(0, 2, 3, 1).view(B, -1, x.size(1))  # Flatten and transpose
+        x = torch.cat([self.cls_token.expand(B, -1, -1), x], dim=1)  # Prepend the classification token
+        x = x + self.positional_embedding
+        x = self.transformer(x)
+        x = x.mean(dim=1)  # Global average pooling
+        x = self.fc(x)
+        return x
+
