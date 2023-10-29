@@ -6,7 +6,7 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 import logging
-
+import PIL
 # #wandb-logging-method-1
 # import wandb
 # wandb.login()
@@ -202,3 +202,41 @@ def evaluate_model(model, dataloader):
     return accuracy
 
     
+
+def do_inference(image: PIL.Image , device: torch.device()) -> str:
+  
+  """
+  Function  read the names of the classes (from the directory).
+  And for inference, the function take input as an Image and the output is a string which represents the class of the image.
+
+  Args:
+      image(PIL.Image) : Image to do inference
+      device(torch.device) : Device to run inference.
+  """
+
+    model.eval() # Evaulation mode..
+    
+    # Get all the classes present in the directory.
+    classes = os.listdir("content/data/train")
+
+    # Convert Image.PIL into tensor form.
+    transform = transforms.Compose([ 
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406),
+                                     (0.229, 0.224, 0.225))
+                                    ]) 
+    image = transform(image)
+
+    # Move the image to device and adding extra dimension for batch.
+    image = image.unsqueeze(0).to(device, non_blocking=True)
+    
+    # Make predcition.
+    with torch.no_grad():
+        output = model(image)
+
+    # Pick index with highest probability
+    _, preds  = torch.max(output, dim=1)
+
+    # Retrieve the class label
+    return classes[preds[0].item()]
