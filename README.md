@@ -117,7 +117,49 @@ if parse_folder('data'):
     train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
 ```
 
+
+### StyleTransfer
+
+**Adding Data for Training**  
+- For the data create a folder 'data'->'images'->'content'-> Add your content image here
+- Create a folder 'data'->'images'->'style'-> Add your style image here
+
+**Training the model ( both discriminator and generator )**  
+- Run the following code to train your model and you can change the default arguments with your custom arguments  
+
+```
+import UniTrain
+from UniTrain.utils.StyleTransfer import image_loader, run_style_transfer, imshow, parse_folder
+import matplotlib.pyplot as plt
+from torchvision.utils import save_image
+from torchvision.models import vgg19
+import torch
+
+if parse_folder('data'):
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    style_img = image_loader("./data/images/style/style.jpg", device)
+    content_img = image_loader("./data/images/content/content.jpg", device)
+
+    assert style_img.size() == content_img.size(), \
+    "we need to import style and content images of the same size"
+
+    input_img = content_img.clone()
+    cnn = vgg19(weights = "VGG19_Weights.DEFAULT").features.eval()
+    output = run_style_transfer(cnn, content_img, style_img, input_img)
+
+    plt.figure()
+    imshow(output, title='Output Image')
+
+    # sphinx_gallery_thumbnail_number = 4
+    plt.ioff()
+    plt.show()
+
+    save_image(output, "./data/images/generated/generated.jpg")
+```
+=======
 # Contributing
 
 Check out [contribution.md](contribution.md) for guidelines on contributing to the repo.
+
 
