@@ -1,7 +1,7 @@
 import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from ..dataset.classification import ClassificationDataset
+from Unitrain.dataset.classification import ClassificationDataset
 import torch.optim as optim
 import torch.nn as nn
 import torch
