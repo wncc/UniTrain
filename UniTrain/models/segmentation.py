@@ -181,3 +181,55 @@ class SegNet(nn.Module):
         x = self.stage5_decoder(x)
 
         return x
+
+class UNetMobileV2(nn.Module):
+    def __init__(self, n_class):
+        super(UNetMobileV2, self).__init__()
+
+        # MobileNetV2 as the backbone
+        self.backbone = mobilenet_v2(pretrained=True)
+
+        # Adjust the number of output channels of the last layer in the backbone
+        self.backbone.classifier[1] = nn.Conv2d(1280, 64, kernel_size=1)
+
+        # Decoder
+        self.upconv1 = nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2)
+        self.d11 = nn.Conv2d(96, 64, kernel_size=3, padding=1)
+        self.d12 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
+
+        self.upconv2 = nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2)
+        self.d21 = nn.Conv2d(64, 32, kernel_size=3, padding=1)
+        self.d22 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
+
+        self.upconv3 = nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2)
+        self.d31 = nn.Conv2d(32, 16, kernel_size=3, padding=1)
+        self.d32 = nn.Conv2d(16, 16, kernel_size=3, padding=1)
+
+        # Output layer
+        self.outconv = nn.Conv2d(16, n_class, kernel_size=1)
+
+    def forward(self, x):
+        # Backbone
+        features = self.backbone.features(x)
+
+        # Decoder
+        xu1 = self.upconv1(features)
+        xu11 = torch.cat([xu1, features[-6]], dim=1)
+        xd11 = F.relu(self.d11(xu11))
+        xd12 = F.relu(self.d12(xd11))
+
+        xu2 = self.upconv2(xd12)
+        xu22 = torch.cat([xu2, features[-12]], dim=1)
+        xd21 = F.relu(self.d21(xu22))
+        xd22 = F.relu(self.d22(xd21))
+
+        xu3 = self.upconv3(xd22)
+        xu33 = torch.cat([xu3, features[-24]], dim=1)
+        xd31 = F.relu(self.d31(xu33))
+        xd32 = F.relu(self.d32(xd31))
+
+        # Output layer
+        out = self.outconv(xd32)
+
+        return out
+
