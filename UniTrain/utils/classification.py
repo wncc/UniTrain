@@ -88,8 +88,7 @@ def parse_folder(dataset_path):
         return None
 
 
-
-def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, criterion_fn = nn.CrossEntropyLoss, optimizer_fn = optim.Adam, checkpoint_dir='checkpoints', logger=None, device=torch.device('cpu')):
+def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, criterion_fn = nn.CrossEntropyLoss, optimizer_fn = optim.Adam, checkpoint_dir='checkpoints', wnb_dir='wnb', logger=None, device=torch.device('cpu')):
 
 
     '''Train a PyTorch model for a classification task.
@@ -155,16 +154,23 @@ def train_model(model, train_data_loader, test_data_loader, num_epochs, learning
             loop.set_postfix(loss= running_loss / (batch_idx + 1))
             if batch_idx % 100 == 99:  # Print and log every 100 batches
                 avg_loss = running_loss / 100
+                
+                # Save the weights and biases and log the path.
+                wnb_path = os.path.join(wnb_dir, f'model_epoch_{epoch + 1}_batch{batch_idx + 1}.pth')
+                torch.save(model.state_dict(), wnb_path)
                 if logger:
-                    logger.info(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}')
+                    logger.info(f'Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {avg_loss:.4f}, wnbPath: {wnb_path}')
+
+
+        accuracy = evaluate_model(model, test_data_loader)
+        
+        # Save the weights and biases and log the path for current epoch.
+        wnb_path = os.path.join(wnb_dir, f'model_epoch_{epoch + 1}.pth')
+        torch.save(model.state_dict(), wnb_path)
+        if logger:
+            logger.info(f'Epoch {epoch + 1}, Validation Accuracy: {accuracy:.2f}%, wnbPath: {wnb_path}')
 
         # Save model checkpoint if accuracy improves
-        accuracy = evaluate_model(model, test_data_loader)
-
-        if logger:
-            logger.info(f'Epoch {epoch + 1}, Validation Accuracy: {accuracy:.2f}%')
-
-
         if accuracy > best_accuracy:
             best_accuracy = accuracy
             checkpoint_path = os.path.join(checkpoint_dir, f'model_epoch_{epoch + 1}.pth')
