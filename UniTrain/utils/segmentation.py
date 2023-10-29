@@ -9,6 +9,7 @@ import torchsummary
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm import tqdm
+import PIL.Image
 
 from ..dataset.segmentation import SegmentationDataset
 
@@ -240,3 +241,37 @@ def iou_score(output, target):
     union = (output | target).float().sum((1, 2))
     iou = (intersection + smooth) / (union + smooth)
     return iou.mean().item()
+
+def do_inference(image: PIL.Image, device: torch.device(), model) -> PIL.Image:
+    """
+    Function is used for inference for segmentation of an Image.
+    Function takes PIL.Image object as input and return a segmented PIL.Image object.    
+    
+    Args:
+        image(PIL.Image) : Image to do inference
+        device(torch.device) : Device to run inference
+        model: Model to inference
+    """
+
+    model.eval() # Evaulation mode..
+
+    # Convert Image.PIL into tensor form.
+    transform = transforms.Compose([ 
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406),
+                                        (0.229, 0.224, 0.225))
+                                    ]) 
+    image = transform(image)
+
+    # Move the image to device and adding extra dimension for batch.
+    image = image.unsqueeze(0).to(device, non_blocking=True)
+
+    # Do infernce.
+    with torch.no_grad():
+        output = model(image)
+
+    # Post-process the segmentation mask.
+    output = output.squeeze(0).cpu().numpy()
+    output = nn.functional.softmax(torch.from_numpy(output), dim=0).argmax(0).cpu().numpy()
+    return transforms.ToPILImage(output)
