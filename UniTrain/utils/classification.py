@@ -86,8 +86,7 @@ def parse_folder(dataset_path):
     except Exception as e:
         print("An error occurred:", str(e))
         return None
-
-
+        
 def train_model(model, train_data_loader, test_data_loader, num_epochs, learning_rate=0.001, criterion_fn = nn.CrossEntropyLoss, optimizer_fn = optim.Adam, checkpoint_dir='checkpoints', wnb_dir='wnb', logger=None, device=torch.device('cpu')):
 
 
