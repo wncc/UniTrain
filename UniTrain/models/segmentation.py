@@ -307,5 +307,18 @@ class VGGNet(nn.Module):
             nn.Conv2d(64, 64, kernel_size=3, padding=1),
             nn.ReLU(inplace=True)
         )
-
+        # Output layer
+        self.output_layer = nn.Conv2d(64, n_class, kernel_size=1)
+    
+    def forward(self, x):
+        # Pass input through the encoder
+        enc = self.encoder(x)
+        
+        # Pass the encoded features through the decoder
+        dec = self.decoder(enc)
+        
+        # Pass the decoder output through the final output layer
+        out = self.output_layer(dec)
+        
+        return out
 
