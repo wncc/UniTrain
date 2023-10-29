@@ -181,3 +181,68 @@ class SegNet(nn.Module):
         x = self.stage5_decoder(x)
 
         return x
+
+class VNet(nn.Module):
+    def __init__(self, n_class):
+        super(VNet, self).__init()
+
+        # Encoder
+        self.enc1 = self.conv_block(1, 16)
+        self.enc2 = self.conv_block(16, 32)
+        self.enc3 = self.conv_block(32, 64)
+        self.enc4 = self.conv_block(64, 128)
+        self.enc5 = self.conv_block(128, 256)
+
+        # Decoder
+        self.upconv5 = self.upconv_block(256, 128)
+        self.dec5 = self.conv_block(256, 128)
+        self.upconv4 = self.upconv_block(128, 64)
+        self.dec4 = self.conv_block(128, 64)
+        self.upconv3 = self.upconv_block(64, 32)
+        self.dec3 = self.conv_block(64, 32)
+        self.upconv2 = self.upconv_block(32, 16)
+        self.dec2 = self.conv_block(32, 16)
+
+        # Output layer
+        self.outconv = nn.Conv3d(16, n_class, kernel_size=1)
+
+    def conv_block(self, in_channels, out_channels):
+        return nn.Sequential(
+            nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv3d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+
+    def upconv_block(self, in_channels, out_channels):
+        return nn.ConvTranspose3d(in_channels, out_channels, kernel_size=2, stride=2)
+
+    def forward(self, x):
+        # Encoder
+        enc1 = self.enc1(x)
+        enc2 = self.enc2(enc1)
+        enc3 = self.enc3(enc2)
+        enc4 = self.enc4(enc3)
+        enc5 = self.enc5(enc4)
+
+        # Decoder
+        upconv5 = self.upconv5(enc5)
+        cat5 = torch.cat((upconv5, enc4), dim=1)  # Concatenate along the channel dimension
+        dec5 = self.dec5(cat5)
+        upconv4 = self.upconv4(dec5)
+        cat4 = torch.cat((upconv4, enc3), dim=1)  # Concatenate along the channel dimension
+        dec4 = self.dec4(cat4)
+        upconv3 = self.upconv3(dec4)
+        cat3 = torch.cat((upconv3, enc2), dim=1)  # Concatenate along the channel dimension
+        dec3 = self.dec3(cat3)
+        upconv2 = self.upconv2(dec3)
+        cat2 = torch.cat((upconv2, enc1), dim=1)  # Concatenate along the channel dimension
+        dec2 = self.dec2(cat2)
+
+        # Output layer
+        out = self.outconv(dec2)
+
+        return out
+
+
+
