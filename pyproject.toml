@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "UniTrain"
+version = "0.2.4"
+description = "A generalized training framework for Deep Learning Tasks"
+authors = ["Ishan Upadhyay <ishan.upadhyay.iitb@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/wncc/UniTrain"
+keywords = ["Deep Learning", "Machine Learning", "Training Framework"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+packages = [{ include = "UniTrain" }]
+
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+torch = "^2.1.0"
+torchvision = "^0.16.0"
+torchsummary = "^1.5.1"
+numpy = "^1.26.1"
+pandas = "^2.1.1"
+opencv-python = "^4.8.1.78"
+tqdm = "^4.66.1"
+matplotlib = "^3.8.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.10.1"
+pylint = "^3.0.2"
+isort = "^5.12.0"
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint.format]
+max-line-length = "88"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
