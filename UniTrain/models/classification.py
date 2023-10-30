@@ -119,6 +119,7 @@ class ResNet9(nn.Module):
         x = self.avg_pool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
+        return x
 
  #ResNet50 functionality addition       
 class ResNet9_50(nn.Module):
