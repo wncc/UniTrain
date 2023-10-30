@@ -12,6 +12,9 @@ import glob
 
 
 
+
+
+
 # #wandb-logging-method-1
 # import wandb
 # wandb.login()
@@ -186,7 +189,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
         iou_score_mean = iou_score_mean / len(test_data_loader)
         average_val_loss = val_loss / len(test_data_loader)
         #uncommment to use wandb-logging-method-1
-        # wandb.log({"val_loss": average_val_loss, "iou_score": iou_score_mean})
+        # wandb.log({"val_loss": average_val_loss, "iou_score": iou_score_mean})        
         if logger and iou:
             logger.info(f'Epoch {epoch + 1}/{num_epochs}, Validation Loss: {average_val_loss:.4f}. IOU Score: {iou_score_mean:.4f}')
         elif logger is not None:
@@ -202,6 +205,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
 
     print('Finished Training')
     wandb.finish()
+    
     
 
 def generate_model_summary(model, input_size):
