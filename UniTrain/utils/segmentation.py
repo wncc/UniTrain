@@ -14,9 +14,40 @@ import PIL.Image
 from ..dataset.segmentation import SegmentationDataset
 
 
+
+
+
+
+# #wandb-logging-method-1
+# import wandb
+# wandb.login()
+
+# n_experiments = 1
+# def def_config(epochs = 10, batch_size = 128, learning_rate = 1e-3):
+#       return {"epochs": epochs, "batch_size": batch_size, "lr": learning_rate}
+
+# wandb.init(
+#     project = "UniTrain-classification",
+#     config = def_config(),
+#   )
+# config = wandb.config
+
+#Method 1 has been commented out because it is more verbose 
+#But it is highly modular and should be used to make a better logger
+
+#Method 2 is mostly for beginner to get a hang of how logging would work
+#wandb-logging-method-2
+#automatically detects the model and logs
+import wandb
+from wandb.keras import WandbCallback
+
+wandb.init(project = "Transfer-Learning Tut",
+    config={"hyper": "parameter"})
+def get_data_loader(data_dir: str, batch_size:int, shuffle:bool=True, transform=None, split='train') -> DataLoader:
 def get_data_loader(
     data_dir: str, batch_size: int, shuffle: bool = True, transform=None, split="train"
 ) -> DataLoader:
+  
     """,
     Create and return a data loader for a custom dataset.
 
@@ -116,11 +147,10 @@ def train_unet(
     iou=False,
     device=torch.device("cpu"),
 ) -> None:
-    """
-    Args:
+   
 
-def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
     '''
+
     Args: 
     model (nn.Module): PyTorch model to train.
     train_data_loader (DataLoader): Data loader of the training dataset.
@@ -134,7 +164,9 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
 
     Returns:
     None
-    """
+    '''
+ 
+
 
     if logger:
         logging.basicConfig(
@@ -146,8 +178,10 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
         )
         logger = logging.getLogger(__name__)
 
+
     loss_criterion = loss_criterion()
     optimizer = optimizer(model.parameters(), lr=learning_rate)
+
 
     best_loss = float("inf")
 
@@ -164,7 +198,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
             targets = targets.squeeze(1)
             outputs.to(device)
             targets.to(device)
-            loss = loss_criterion(outputs, targets)
+            loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -194,13 +228,14 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
                 targets = targets.squeeze(1)
                 outputs.to(device)
                 targets.to(device)
-                loss = loss_criterion(outputs, targets)
+                loss = criterion(outputs, targets)
                 val_loss += loss.item()
                 iou_score_mean += iou_score(outputs, targets)
 
         iou_score_mean = iou_score_mean / len(test_data_loader)
         average_val_loss = val_loss / len(test_data_loader)
-
+        #uncommment to use wandb-logging-method-1
+        # wandb.log({"val_loss": average_val_loss, "iou_score": iou_score_mean})        
         if logger and iou:
             logger.info(
                 f"Epoch {epoch + 1}/{num_epochs}, Validation Loss: {average_val_loss:.4f}. IOU Score: {iou_score_mean:.4f}"
@@ -220,6 +255,9 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
 
     print("Finished Training")
 
+    wandb.finish()
+    
+    
 
 def generate_model_summary(model, input_size):
     """Generate a summary of the model."""
