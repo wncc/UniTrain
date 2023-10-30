@@ -176,7 +176,6 @@ def train_model(
     logger=None,
     iou=False,
 ):
-
     os.makedirs(checkpoint_dir + "/discriminator_checkpoint", exist_ok=True)
     os.makedirs(checkpoint_dir + "/generator_checkpoint", exist_ok=True)
 
@@ -213,20 +212,40 @@ def train_model(
                 device="cpu",
             )
 
-        progress_bar = tqdm(train_data_loader, desc=f'Epoch {epoch + 1}/{epochs}', leave=False, dynamic_ncols=True)
+        progress_bar = tqdm(
+            train_data_loader,
+            desc=f"Epoch {epoch + 1}/{epochs}",
+            leave=False,
+            dynamic_ncols=True,
+        )
 
         for real_images, _ in progress_bar:
             # Train discriminator
             i += 1
-            loss_d, real_score, fake_score = train_discriminator(discriminator_model, generator_model, real_images, opt_d, 128, 128, device='cpu')
+            loss_d, real_score, fake_score = train_discriminator(
+                discriminator_model,
+                generator_model,
+                real_images,
+                opt_d,
+                128,
+                128,
+                device="cpu",
+            )
 
             # Train generator
             loss_g = train_generator(
                 opt_g, discriminator_model, generator_model, batch_size, device="cpu"
             )
 
-            progress_bar.set_postfix({'Loss D': loss_d, 'Loss G': loss_g, 'Real Score': real_score, 'Fake Score': fake_score})
-        
+            progress_bar.set_postfix(
+                {
+                    "Loss D": loss_d,
+                    "Loss G": loss_g,
+                    "Real Score": real_score,
+                    "Fake Score": fake_score,
+                }
+            )
+
         progress_bar.close()
 
         # Record losses & scores
@@ -237,8 +256,6 @@ def train_model(
 
         # Save generated images
         save_samples(epoch + epoch, generator_model, fixed_latent, show=False)
-
-
 
 
 def evaluate_model(discriminator_model, dataloader):

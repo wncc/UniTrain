@@ -102,7 +102,6 @@ def parse_folder(dataset_path):
         return False
 
 
-
 def train_unet(
     model,
     train_data_loader,
@@ -117,23 +116,23 @@ def train_unet(
     device=torch.device("cpu"),
 ) -> None:
     """
-    Args:
+        Args:
 
-def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
-    '''
-    Args: 
-    model (nn.Module): PyTorch model to train.
-    train_data_loader (DataLoader): Data loader of the training dataset.
-    test_data_loader (DataLoader): Data loader of the test dataset.
-    num_epochs (int): Number of epochs to train the model.
-    learning_rate (float): Learning rate for the optimizer.
-    checkpoint_dir (str): Directory to save model checkpoints.
-    logger (Logger): Logger to log training information.
-    iou (bool): Whether to calculate the IOU score.
-    device (torch.device): Device to run training on (GPU or CPU).
+    def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
+        '''
+        Args:
+        model (nn.Module): PyTorch model to train.
+        train_data_loader (DataLoader): Data loader of the training dataset.
+        test_data_loader (DataLoader): Data loader of the test dataset.
+        num_epochs (int): Number of epochs to train the model.
+        learning_rate (float): Learning rate for the optimizer.
+        checkpoint_dir (str): Directory to save model checkpoints.
+        logger (Logger): Logger to log training information.
+        iou (bool): Whether to calculate the IOU score.
+        device (torch.device): Device to run training on (GPU or CPU).
 
-    Returns:
-    None
+        Returns:
+        None
     """
 
     if logger:
@@ -242,26 +241,28 @@ def iou_score(output, target):
     iou = (intersection + smooth) / (union + smooth)
     return iou.mean().item()
 
+
 def do_inference(image: PIL.Image, device: torch.device(), model) -> PIL.Image:
     """
     Function is used for inference for segmentation of an Image.
-    Function takes PIL.Image object as input and return a segmented PIL.Image object.    
-    
+    Function takes PIL.Image object as input and return a segmented PIL.Image object.
+
     Args:
         image(PIL.Image) : Image to do inference
         device(torch.device) : Device to run inference
         model: Model to inference
     """
 
-    model.eval() # Evaulation mode..
+    model.eval()  # Evaulation mode..
 
     # Convert Image.PIL into tensor form.
-    transform = transforms.Compose([ 
-                transforms.Resize((224, 224)),
-                transforms.ToTensor(),
-                transforms.Normalize((0.485, 0.456, 0.406),
-                                        (0.229, 0.224, 0.225))
-                                    ]) 
+    transform = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ]
+    )
     image = transform(image)
 
     # Move the image to device and adding extra dimension for batch.
@@ -273,5 +274,7 @@ def do_inference(image: PIL.Image, device: torch.device(), model) -> PIL.Image:
 
     # Post-process the segmentation mask.
     output = output.squeeze(0).cpu().numpy()
-    output = nn.functional.softmax(torch.from_numpy(output), dim=0).argmax(0).cpu().numpy()
+    output = (
+        nn.functional.softmax(torch.from_numpy(output), dim=0).argmax(0).cpu().numpy()
+    )
     return transforms.ToPILImage(output)
