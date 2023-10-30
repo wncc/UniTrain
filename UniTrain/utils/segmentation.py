@@ -10,6 +10,9 @@ import torchsummary
 import logging
 import glob
 
+
+
+
 def get_data_loader(data_dir: str, batch_size:int, shuffle:bool=True, transform=None, split='train') -> DataLoader:
     """,
     Create and return a data loader for a custom dataset.
@@ -88,10 +91,9 @@ def parse_folder(dataset_path):
         return False
 
 
-
-
-def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, optimizer = optim.Adam, loss_criterion = nn.CrossEntropyLoss, logger=None, iou=False, device=torch.device('cpu')) -> None:
-
+def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_rate, checkpoint_dir, logger=None, iou=False, device=torch.device('cpu')) -> None:
+    '''Train the model using the given train and test data loaders.
+    
     Args: 
     model (nn.Module): PyTorch model to train.
     train_data_loader (DataLoader): Data loader of the training dataset.
@@ -107,15 +109,14 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
     None
     '''
 
-
     if logger:
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - Epoch %(epoch)d - Train Acc: %(train_acc).4f - Val Acc: %(val_acc).4f - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S', filename=logger, filemode='w')
         logger = logging.getLogger(__name__)
 
 
-    loss_criterion = loss_criterion()
-    optimizer = optimizer(model.parameters(), lr=learning_rate)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     best_loss = float('inf')
 
@@ -130,7 +131,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
             targets = targets.squeeze(1)
             outputs.to(device)
             targets.to(device)
-            loss = loss_criterion(outputs, targets)
+            loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
@@ -154,13 +155,13 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
                 targets = targets.squeeze(1)
                 outputs.to(device)
                 targets.to(device)
-                loss = loss_criterion(outputs, targets)
+                loss = criterion(outputs, targets)
                 val_loss += loss.item()
                 iou_score_mean += iou_score(outputs, targets)
 
         iou_score_mean = iou_score_mean / len(test_data_loader)
         average_val_loss = val_loss / len(test_data_loader)
-
+        
         if logger and iou:
             logger.info(f'Epoch {epoch + 1}/{num_epochs}, Validation Loss: {average_val_loss:.4f}. IOU Score: {iou_score_mean:.4f}')
         elif logger is not None:
@@ -175,6 +176,7 @@ def train_unet(model, train_data_loader, test_data_loader, num_epochs, learning_
                 logger.info(f'Saved checkpoint to {checkpoint_path}')
 
     print('Finished Training')
+    
 
 def generate_model_summary(model, input_size):
     '''Generate a summary of the model.'''

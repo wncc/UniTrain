@@ -11,7 +11,6 @@ from UniTrain.dataset.DCGAN import DCGANdataset
 from tqdm.notebook import tqdm
 import torch.nn.functional as F
 
-
 latent_size = 128
 stats = (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)
 
@@ -93,7 +92,6 @@ def train_discriminator(discriminator, generator, real_images, opt_d, batch_size
     
 
     real_targets = torch.ones(real_images.size(0), 1, device=device)
-    real_preds = discriminator(real_images)
     real_loss = F.binary_cross_entropy(real_preds, real_targets)
     real_score = torch.mean(real_preds).item()
 
@@ -179,11 +177,12 @@ def train_model(discriminator_model, generator_model, train_data_loader , batch_
         losses_d.append(loss_d)
         real_scores.append(real_score)
         fake_scores.append(fake_score)
-
+        
         # Save generated images
         save_samples(epoch+epoch,generator_model , fixed_latent, show=False)
 
     print('Finished Training')
+    
 
 def evaluate_model(discriminator_model, dataloader):
     discriminator_model.eval()  # Set the model to evaluation mode
