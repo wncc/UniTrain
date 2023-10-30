@@ -3,6 +3,7 @@ import glob
 from PIL import Image
 import torch
 from torch.utils.data import Dataset
+import wandb
 
 class DCGANdataset:
     def __init__(self, data_dir, transform=None):
@@ -35,3 +36,18 @@ class DCGANdataset:
             image = self.transform(image)
 
         return image, target
+
+# Initialize wandb
+wandb.init(project="your_project_name", entity="your_entity_name")
+
+# Your training code here
+# Log the model architecture
+wandb.watch(model)
+
+for epoch in range(num_epochs):
+    # Your training code here
+    wandb.log({"model_weights": model.state_dict()})
+    # Log images or other metrics as needed
+
+# Finish the wandb run
+wandb.finish()
