@@ -1,15 +1,15 @@
 # Contributing Guidelines
 
-## Follow these steps for making contrbutions to this repository
+## Follow these steps for making contributions to this repository
 
 1. Fork this repo.
 1. Make changes as per the issue and push it to your forked repo.
 1. Generate a Pull request to the stg-dev branch.
 1. Make separate Pull requests for each issue you solve.
-1. Make sure to send all pull requests to the std-dev branch.
+1. Make sure to send all pull requests to the stg-dev branch.
 1. Do changes and again send pull request if you receive any reviews.
 
-## Developing in the respository
+## Developing in the repository
 
 After cloning the repository, follow these steps before you start writing any code!
 
