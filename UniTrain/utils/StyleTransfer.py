@@ -8,8 +8,10 @@ from torchvision import transforms
 
 
 class ContentLoss(nn.Module):
-
-    def __init__(self, target,):
+    def __init__(
+        self,
+        target,
+    ):
         super(ContentLoss, self).__init__()
         # we 'detach' the target content from the tree used
         # to dynamically compute the gradient: this is a stated value,
@@ -20,9 +22,9 @@ class ContentLoss(nn.Module):
     def forward(self, input):
         self.loss = F.mse_loss(input, self.target)
         return input
-    
-class StyleLoss(nn.Module):
 
+
+class StyleLoss(nn.Module):
     def __init__(self, target_feature):
         super(StyleLoss, self).__init__()
         self.target = self.gram_matrix(target_feature).detach()
@@ -31,7 +33,7 @@ class StyleLoss(nn.Module):
         G = self.gram_matrix(input)
         self.loss = F.mse_loss(G, self.target)
         return input
-    
+
     def gram_matrix(self, input):
         a, b, c, d = input.size()  # a=batch size(=1)
         # b=number of feature maps
@@ -45,6 +47,7 @@ class StyleLoss(nn.Module):
         # by dividing by the number of element in each feature maps.
         return G.div(a * b * c * d)
 
+
 # create a module to normalize input image so we can easily put it in a
 # ``nn.Sequential``
 class Normalization(nn.Module):
@@ -56,10 +59,10 @@ class Normalization(nn.Module):
         self.mean = mean.clone().detach().view(-1, 1, 1)
         self.std = std.clone().detach().view(-1, 1, 1)
 
-
     def forward(self, img):
         # normalize ``img``
         return (img - self.mean) / self.std
+
 
 def parse_folder(dataset_path):
     print(dataset_path)
@@ -68,8 +71,8 @@ def parse_folder(dataset_path):
     try:
         if os.path.exists(dataset_path):
             # Store paths to train, test, and eval folders if they exist
-            content_path = os.path.join(dataset_path, 'images', 'content')
-            style_path = os.path.join(dataset_path, 'images', 'style')
+            content_path = os.path.join(dataset_path, "images", "content")
+            style_path = os.path.join(dataset_path, "images", "style")
 
             if os.path.exists(content_path) & os.path.exists(style_path):
                 print("Content Data folder path:", content_path)
@@ -86,22 +89,24 @@ def parse_folder(dataset_path):
             else:
                 print("Either content or style directory does not exist")
                 return None
-            
+
         else:
-            print(f"The '{dataset_path}' folder does not exist in the current directory.")
+            print(
+                f"The '{dataset_path}' folder does not exist in the current directory."
+            )
             return None
-        
+
     except Exception as e:
         print("An error occurred:", str(e))
         return None
+
 
 def image_loader(image_name, device):
     # desired size of the output image
     imsize = 512 if torch.cuda.is_available() else 128  # use small size if no GPU
 
-    loader = transforms.Compose([
-        transforms.Resize(imsize),  # scale imported image
-        transforms.ToTensor()]
+    loader = transforms.Compose(
+        [transforms.Resize(imsize), transforms.ToTensor()]  # scale imported image
     )  # transform it into a torch tensor
 
     image = Image.open(image_name)
@@ -111,11 +116,16 @@ def image_loader(image_name, device):
 
     return image.to(device, torch.float)
 
-def get_style_model_and_losses(style_img, content_img, cnn, normalization_mean, normalization_std, 
-                               content_layers = ['conv_4'], # desired depth layers to compute style/content losses
-                               style_layers = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']   
-                               ):
 
+def get_style_model_and_losses(
+    style_img,
+    content_img,
+    cnn,
+    normalization_mean,
+    normalization_std,
+    content_layers=["conv_4"],  # desired depth layers to compute style/content losses
+    style_layers=["conv_1", "conv_2", "conv_3", "conv_4", "conv_5"],
+):
     # normalization module
     normalization = Normalization(normalization_mean, normalization_std)
 
@@ -132,19 +142,19 @@ def get_style_model_and_losses(style_img, content_img, cnn, normalization_mean, 
     for layer in cnn.children():
         if isinstance(layer, nn.Conv2d):
             i += 1
-            name = f'conv_{i}'
+            name = f"conv_{i}"
         elif isinstance(layer, nn.ReLU):
-            name = f'relu_{i}'
+            name = f"relu_{i}"
             # The in-place version doesn't play very nicely with the ``ContentLoss``
             # and ``StyleLoss`` we insert below. So we replace with out-of-place
             # ones here.
             layer = nn.ReLU(inplace=False)
         elif isinstance(layer, nn.MaxPool2d):
-            name = f'pool_{i}'
+            name = f"pool_{i}"
         elif isinstance(layer, nn.BatchNorm2d):
-            name = f'bn_{i}'
+            name = f"bn_{i}"
         else:
-            raise RuntimeError(f'Unrecognized layer: {layer.__class__.__name__}')
+            raise RuntimeError(f"Unrecognized layer: {layer.__class__.__name__}")
 
         model.add_module(name, layer)
 
@@ -167,18 +177,31 @@ def get_style_model_and_losses(style_img, content_img, cnn, normalization_mean, 
         if isinstance(model[i], ContentLoss) or isinstance(model[i], StyleLoss):
             break
 
-    model = model[:(i + 1)]
+    model = model[: (i + 1)]
 
     return model, style_losses, content_losses
 
-def run_style_transfer(cnn, content_img, style_img, input_img, normalization_mean = torch.tensor([0.485, 0.456, 0.406]), # VGG networks are trained on images with each channel normalized by 
-                        normalization_std = torch.tensor([0.229, 0.224, 0.225]),  # mean=[0.485, 0.456, 0.406] and std=[0.229, 0.224, 0.225]
-                        num_steps=300,
-                       style_weight=1000000, content_weight=1):
+
+def run_style_transfer(
+    cnn,
+    content_img,
+    style_img,
+    input_img,
+    normalization_mean=torch.tensor(
+        [0.485, 0.456, 0.406]
+    ),  # VGG networks are trained on images with each channel normalized by
+    normalization_std=torch.tensor(
+        [0.229, 0.224, 0.225]
+    ),  # mean=[0.485, 0.456, 0.406] and std=[0.229, 0.224, 0.225]
+    num_steps=300,
+    style_weight=1000000,
+    content_weight=1,
+):
     """Run the style transfer."""
-    print('Building the style transfer model..')
-    model, style_losses, content_losses = get_style_model_and_losses(style_img, content_img, cnn,
-        normalization_mean, normalization_std)
+    print("Building the style transfer model..")
+    model, style_losses, content_losses = get_style_model_and_losses(
+        style_img, content_img, cnn, normalization_mean, normalization_std
+    )
 
     # We want to optimize the input and not the model parameters so we
     # update all the requires_grad fields accordingly
@@ -190,7 +213,7 @@ def run_style_transfer(cnn, content_img, style_img, input_img, normalization_mea
 
     optimizer = optim.LBFGS([input_img])
 
-    print('Optimizing..')
+    print("Optimizing..")
     run = [0]
     while run[0] <= num_steps:
 
@@ -218,8 +241,11 @@ def run_style_transfer(cnn, content_img, style_img, input_img, normalization_mea
             run[0] += 1
             if run[0] % 50 == 0:
                 print("run {}:".format(run))
-                print('Style Loss : {:4f} Content Loss: {:4f}'.format(
-                    style_score.item(), content_score.item()))
+                print(
+                    "Style Loss : {:4f} Content Loss: {:4f}".format(
+                        style_score.item(), content_score.item()
+                    )
+                )
                 print()
 
             return style_score + content_score
@@ -232,11 +258,12 @@ def run_style_transfer(cnn, content_img, style_img, input_img, normalization_mea
 
     return input_img
 
-def imshow(tensor, unloader = transforms.ToPILImage(), title=None):
+
+def imshow(tensor, unloader=transforms.ToPILImage(), title=None):
     image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
-    image = image.squeeze(0)      # remove the fake batch dimension
+    image = image.squeeze(0)  # remove the fake batch dimension
     image = unloader(image)
     plt.imshow(image)
     if title is not None:
         plt.title(title)
-    plt.pause(0.001) # pause a bit so that plots are updated
+    plt.pause(0.001)  # pause a bit so that plots are updated
