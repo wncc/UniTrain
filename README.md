@@ -116,7 +116,14 @@ if parse_folder('data'):
 
     train_model( discriminator_model, generator_model, train_dataloader, batch_size = 128 ,  epochs = 25, learning_rate = 1e-3, torch.device('cpu'),checkpoint_dir='checkpoints')
 ```
-
+### W&B Logging (Weights and Biases Dashboard)
+- This is an easy way to maintain a log of all runs of your model and save data about the same
+- W&B creates a dashboard where data for each run is saved and can be easily accessed whilst being visually stunning
+- This functionality has been added in the training files in UniTrain/utils for classification.py, segmentation.py and DCGAN.py
+- An additional method to log specific info such as images on each run of the GAN or IOU scores and many more such variables has been added as comments in these above files and can be used instead to create a custom logging on W&B as opposed to the default logger
+- A tutorial on W&B to get a clearer idea: https://docs.wandb.ai/guides/track 
+- The above link also contains .ipynb notebooks to run examples
+- The user will have to create a W&B account and enter his passkey to log the experiments to his account
 
 ### StyleTransfer
 
