@@ -322,3 +322,63 @@ class VGGNet(nn.Module):
         
         return out
 
+
+class VNet(nn.Module):
+    def _init_(self, in_channels, out_channels):
+        super(VNet, self)._init_()
+
+        # Encoder
+        self.enc1 = self.conv_block(in_channels, 32)
+        self.enc2 = self.conv_block(32, 64)
+        self.enc3 = self.conv_block(64, 128)
+        self.enc4 = self.conv_block(128, 256)
+
+        # Bottleneck (center)
+        self.center = self.conv_block(256, 512)
+
+        # Decoder
+        self.dec4 = self.conv_block(512, 256)
+        self.dec3 = self.conv_block(256, 128)
+        self.dec2 = self.conv_block(128, 64)
+        self.dec1 = self.conv_block(64, 32)
+
+        # Output layer
+        self.final_conv = nn.Conv3d(32, out_channels, kernel_size=1)
+
+    def conv_block(self, in_channels, out_channels):
+        return nn.Sequential(
+            nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv3d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        # Encoder
+        enc1 = self.enc1(x)
+        enc2 = F.max_pool3d(enc1, 2)
+        enc3 = self.enc2(enc2)
+        enc4 = F.max_pool3d(enc3, 2)
+        enc5 = self.enc3(enc4)
+        enc6 = F.max_pool3d(enc5, 2)
+        enc7 = self.enc4(enc6)
+        enc8 = F.max_pool3d(enc7, 2)
+
+        # Center (bottleneck)
+        center = self.center(enc8)
+
+        # Decoder
+        dec7 = torch.cat([F.interpolate(center, scale_factor=2, mode='trilinear', align_corners=True), enc7], dim=1)
+        dec6 = self.dec4(dec7)
+        dec6 = torch.cat([F.interpolate(dec6, scale_factor=2, mode='trilinear', align_corners=True), enc6], dim=1)
+        dec5 = self.dec3(dec6)
+        dec5 = torch.cat([F.interpolate(dec5, scale_factor=2, mode='trilinear', align_corners=True), enc5], dim=1)
+        dec4 = self.dec2(dec5)
+        dec4 = torch.cat([F.interpolate(dec4, scale_factor=2, mode='trilinear', align_corners=True), enc4], dim=1)
+        dec3 = self.dec1(dec4)
+        dec3 = torch.cat([F.interpolate(dec3, scale_factor=2, mode='trilinear', align_corners=True), enc3], dim=1)
+
+        # Output layer
+        output = self.final_conv(dec3)
+        return output
+
